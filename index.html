@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Citoyen Direct - Mairie Mobile</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #27ae60;
+            --accent: #e67e22;
+            --light: #ecf0f1;
+            --dark: #34495e;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            background-color: var(--light);
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 1rem;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 0 15px;
+        }
+
+        /* Section Annonces */
+        .section-title {
+            font-size: 1.2rem;
+            border-left: 4px solid var(--secondary);
+            padding-left: 10px;
+            margin: 20px 0;
+        }
+
+        .annonces-container {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 10px;
+        }
+
+        .annonce-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            min-width: 250px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .annonce-card h4 { margin: 0 0 5px 0; color: var(--accent); }
+        .lang-tag { font-size: 0.8rem; color: #7f8c8d; font-style: italic; }
+
+        /* Formulaire */
+        .card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        label { display: block; margin-bottom: 8px; font-weight: bold; }
+        select, textarea, input {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        button:hover { background-color: #219150; }
+
+        /* Chatbot */
+        #chat-window {
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message {
+            margin: 5px 0;
+            padding: 8px 12px;
+            border-radius: 15px;
+            max-width: 80%;
+        }
+
+        .bot { background: #d1ecf1; align-self: flex-start; }
+        .user { background: var(--secondary); color: white; align-self: flex-end; }
+
+        .voice-btn {
+            background: var(--accent);
+            margin-top: 5px;
+        }
+
+        .hidden { display: none; }
+
+        .success-msg {
+            color: var(--secondary);
+            text-align: center;
+            font-weight: bold;
+            padding: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<header>
+    <h1>Citoyen Direct</h1>
+    <p>Ma mairie dans ma poche</p>
+</header>
+
+<div class="container">
+    
+    <h3 class="section-title">Annonces Officielles / Nyadzɔdzɔwo</h3>
+    <div class="annonces-container">
+        <div class="annonce-card">
+            <h4>Coupure d'eau / Tsi matsimatsi</h4>
+            <p>Maintenance le 15 Octobre.</p>
+            <p class="lang-tag">Woa tsi tsi la le Kele 15 dzi.</p>
+        </div>
+        <div class="annonce-card">
+            <h4>Vaccination / Abui dodo</h4>
+            <p>Campagne au centre de santé.</p>
+            <p class="lang-tag">Wole abui dom le dɔnɔkɔƒe.</p>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3 style="margin-top:0;">Signaler un Problème</h3>
+        <form id="reportForm">
+            <label>Type de problème</label>
+            <select id="issueType">
+                <option value="eau">Eau (Tsi)</option>
+                <option value="electricite">Électricité (Zo)</option>
+                <option value="route">Route (Mɔ)</option>
+                <option value="dechets">Déchets (Gbeɖuɖu)</option>
+            </select>
+
+            <label>Description</label>
+            <textarea id="description" rows="3" placeholder="Décrivez le problème ici..."></textarea>
+            
+            <button type="submit" id="submitBtn">Envoyer le signalement</button>
+        </form>
+        <div id="confirmation" class="success-msg hidden">
+            ✅ Merci ! Votre signalement a été reçu. <br>
+            (Akpe! Woxɔ wò kuxi la.)
+        </div>
+    </div>
+
+    <div class="card">
+        <h3 style="margin-top:0;">Assistant Intelligent (IA)</h3>
+        <div id="chat-window">
+            <div class="message bot">
+                Bonjour ! Je suis votre assistant. Comment puis-je vous aider ? <br>
+                <b>(Ŋdi na wò! Nye mɔfiala. Aleke magate ŋu akpe ɖe ŋuwò?)</b>
+            </div>
+        </div>
+        <div style="display: flex; gap: 5px;">
+            <input type="text" id="chatInput" placeholder="Posez une question...">
+            <button id="sendChat" style="width: 80px;">OK</button>
+        </div>
+        <button class="voice-btn" onclick="simulateVoice()">🎤 Parler (Vocale / Gbe mɔnu)</button>
+    </div>
+
+</div>
+
+<script>
+    // Gestion du formulaire
+    document.getElementById('reportForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const btn = document.getElementById('submitBtn');
+        const confirm = document.getElementById('confirmation');
+        
+        btn.innerText = "Envoi en cours...";
+        
+        setTimeout(() => {
+            btn.classList.add('hidden');
+            confirm.classList.remove('hidden');
+            
+            // Réinitialisation après 3 secondes
+            setTimeout(() => {
+                btn.classList.remove('hidden');
+                btn.innerText = "Envoyer le signalement";
+                confirm.classList.add('hidden');
+                document.getElementById('reportForm').reset();
+            }, 4000);
+        }, 1000);
+    });
+
+    // Gestion du Chatbot
+    const chatWindow = document.getElementById('chat-window');
+    const chatInput = document.getElementById('chatInput');
+    const sendChat = document.getElementById('sendChat');
+
+    function addMessage(text, side) {
+        const msg = document.createElement('div');
+        msg.className = `message ${side}`;
+        msg.innerHTML = text;
+        chatWindow.appendChild(msg);
+        chatWindow.scrollTop = chatWindow.scrollHeight;
+    }
+
+    function botReply(input) {
+        let reply = "";
+        const val = input.toLowerCase();
+
+        if (val.includes("route") || val.includes("mɔ")) {
+            reply = "Les travaux routiers sont gérés par le service technique. Un agent passera voir.<br><b>(Dɔwɔlawo ava kpɔ mɔ la gbɔ kpuie.)</b>";
+        } else if (val.includes("eau") || val.includes("tsi")) {
+            reply = "Vérifiez si c'est une coupure générale dans les annonces en haut.<br><b>(Kpɔ nyadzɔdzɔ siwo le tame la be tsi la tsi le dukɔa katã mea.)</b>";
+        } else if (val.includes("merci") || val.includes("akpe")) {
+            reply = "À votre service ! <br><b>(Mèle wò dɔwɔƒe!)</b>";
+        } else {
+            reply = "Je transmets votre demande à la mairie. Voulez-vous ajouter une photo ? <br><b>(Ma gblɔ nya la na mɔɖelawo. Àdi be yea ɖo nɔnɔmetata ɖaa?)</b>";
+        }
+
+        setTimeout(() => addMessage(reply, 'bot'), 600);
+    }
+
+    sendChat.addEventListener('click', () => {
+        if (chatInput.value.trim() !== "") {
+            addMessage(chatInput.value, 'user');
+            botReply(chatInput.value);
+            chatInput.value = "";
+        }
+    });
+
+    // Simulation de voix
+    function simulateVoice() {
+        addMessage("<i>[Message Vocal Enregistré...]</i>", 'user');
+        setTimeout(() => {
+            addMessage("J'ai bien entendu votre message vocal. Je l'envoie à la mairie.<br><b>(Mese wò gbe. Maɖoe ɖe mɔɖelawo.)</b>", 'bot');
+        }, 1000);
+    }
+</script>
+
+</body>
+</html>
